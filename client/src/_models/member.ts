@@ -2,14 +2,15 @@ import { Photo } from "./photo"
 
 export interface Member {
     id: number
-    userName: string
+    username: string
     age: number
-    photoUlr: string
+    photoUrl: string
     knownAs: string
     created: Date
     lastActive: Date
     gender: string
     introduction: string
+    interests: string
     lookingFor: string
     city: string
     country: string

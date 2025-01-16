@@ -2,11 +2,11 @@
 public class MemberDto
 {
     public int Id { get; set; }
-    public required string UserName { get; set; }
+    public required string Username { get; set; }
 
 
     public int Age { get; set; }
-    public string? PhotoUlr { get; set; }
+    public string? PhotoUrl { get; set; }
     public string? KnownAs { get; set; }
 
     public DateTime Created { get; set; }
