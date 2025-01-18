@@ -96,7 +96,8 @@
 
                 </tab>
                     <tab heading="Edit phoyos">
-                        <h4>Photo edit will go here</h4>
+                        <app-photo-editor [member]="member"
+                        (memberChange)="onMemberChange(member)"></app-photo-editor>
                     </tab>
                     <tab heading="Messages">
                         <h4>Hello world</h4>
