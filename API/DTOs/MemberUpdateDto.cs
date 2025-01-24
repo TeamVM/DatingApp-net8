@@ -1,5 +1,5 @@
 ﻿namespace API.DTOs;
-public class MemberUpdatedDto
+public class MemberUpdateDto
 {
     public string? Introduction { get; set; }
 

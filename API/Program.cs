@@ -2,42 +2,44 @@ using API.Data;
 using API.Entities;
 using API.ExceptionMiddleware;
 using API.Extensions;
+using API.SignalR;
 using Entities;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
-builder.Services.AddApplicationService(builder.Configuration);
+builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 var app = builder.Build();
-//app.UseDeveloperExceptionPage();
-app.UseMiddleware<ExceptionMiddleware>();   
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().
-    WithOrigins("http://localhost:4200", "https://localhost:4200"));
+
+// Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
+    .WithOrigins("http://localhost:4200", "https://localhost:4200"));
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<PresenceHub>("hubs/presence");
+app.MapHub<MessageHub>("hubs/message");
 
-using var scoope = app.Services.CreateScope();
-var services = scoope.ServiceProvider;
+using var scope = app.Services.CreateScope();
+var services = scope.ServiceProvider;
 try
 {
     var context = services.GetRequiredService<DataContext>();
     var userManager = services.GetRequiredService<UserManager<AppUser>>();
     var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
     await context.Database.MigrateAsync();
-    //await Seed.SeedUsers(context);
+    await context.Database.ExecuteSqlRawAsync("DELETE FROM [Connections]");
     await Seed.SeedUsers(userManager, roleManager);
 }
-catch(Exception ex)
+catch (Exception ex)
 {
     var logger = services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "An error occured during migration");
-    throw;
+    logger.LogError(ex, "An error occurred during migration");
 }
-
 app.Run();
